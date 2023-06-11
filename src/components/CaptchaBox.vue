@@ -15,10 +15,10 @@
     <div class="ctrl-box">
 
       <div class="left-box">
-        <button class="reset icon">
+        <button @click="loadRandomData()" class="reset icon">
           <svg viewBox="0 0 24 24">
-            <path d="M21,3v7h-7l2.9-2.9C15.7,5.8,13.9,5,12,5c-3.9,0-7,3.1-7,7s3.1,7,7,7c3.2,0,5.9-2.2,6.8-5.2l2,0.4
-              c-1,3.9-4.5,6.7-8.7,6.7c-5,0-9-4-9-9s4-9,9-9c2.5,0,4.7,1,6.4,2.6L21,3z">
+            <path
+              d="M21,3v7h-7l2.9-2.9C15.7,5.8,13.9,5,12,5c-3.9,0-7,3.1-7,7s3.1,7,7,7c3.2,0,5.9-2.2,6.8-5.2l2,0.4 c-1,3.9-4.5,6.7-8.7,6.7c-5,0-9-4-9-9s4-9,9-9c2.5,0,4.7,1,6.4,2.6L21,3z">
             </path>
           </svg>
         </button>
@@ -32,23 +32,41 @@
 export default {
   data () {
     return {
-      character: "天天座理世",
-      images: [
-        { id: 1, url: '/assets/test/1.jpg', selected: false },
-        { id: 2, url: '/assets/test/2.jpg', selected: false },
-        { id: 3, url: '/assets/test/3.jpg', selected: false },
-        { id: 4, url: '/assets/test/4.jpg', selected: false },
-        { id: 5, url: '/assets/test/5.jpg', selected: false },
-        { id: 6, url: '/assets/test/6.jpg', selected: false },
-        { id: 7, url: '/assets/test/7.jpg', selected: false },
-        { id: 8, url: '/assets/test/8.jpg', selected: false },
-        { id: 9, url: '/assets/test/9.jpg', selected: false }
-      ],
-      correctImageIds: [1, 7],
+      character: null,
+      images: [],
+      correctImageIds: [],
       warningText: "",
+      jsonBaseUrl: "/assets/",
+      jsonFileCount: "2",
+      lastRandomIndex: null,
     }
   },
+  mounted () {
+    this.loadRandomData();
+  },
   methods: {
+    loadRandomData () {
+      let randomIndex = this.lastRandomIndex; // Start with the last random index
+      while (randomIndex === this.lastRandomIndex) {
+        randomIndex = Math.floor(Math.random() * this.jsonFileCount) + 1;
+      }
+      this.lastRandomIndex = randomIndex; // Store the current random index
+      const jsonUrl = `${this.jsonBaseUrl}${randomIndex}.json`;
+      fetch(jsonUrl)
+        .then(response => response.json())
+        .then(data => {
+          this.character = data.character;
+          this.images = data.images;
+          this.correctImageIds = data.correctImageIds;
+          this.resetSelections();
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    },
+    resetSelections () {
+      this.images.forEach(image => image.selected = false);
+    },
     toggleSelected (image) {
       const index = this.getImageIndex(image);
       this.images[index].selected = !this.images[index].selected;
@@ -62,12 +80,20 @@ export default {
     checkAnswer () {
       const selectedCount = this.images.filter(image => image.selected).length;
       const warning = document.querySelector('.ct-warning');
-
+      //判断错误图片选择情况
       const incorrectSelectedCount = this.images.filter(image => image.selected && !this.correctImageIds.includes(image.id)).length;
+      //判断正确图片选择情况
+      const correctSelectedCount = this.images.filter(image => image.selected && this.correctImageIds.includes(image.id)).length;
       if (incorrectSelectedCount > 1) {
         // 用户选择了多于2张其他不是正确答案的图片
         warning.style.display = 'block';
         this.warningText = "请重试。";
+        this.loadRandomData();
+        return;
+      } else if (correctSelectedCount > 0 && incorrectSelectedCount > 0) {
+        warning.style.display = 'block';
+        this.warningText = "请重试。";
+        this.loadRandomData();
         return;
       } else if (incorrectSelectedCount > 0) {
         // 用户选择了少于或等于2张其他不是正确答案的图片
@@ -86,7 +112,6 @@ export default {
         warning.style.display = 'none';
       }
 
-      const correctSelectedCount = this.images.filter(image => image.selected && this.correctImageIds.includes(image.id)).length;
       if (correctSelectedCount !== this.correctImageIds.length) {
         // 用户只选择了正确图片的一部分
         warning.style.display = 'block';
@@ -105,6 +130,7 @@ export default {
         // 用户选择的图片包含正确的图片，但是还包含其他不属于正确图片的图片
         warning.style.display = 'block';
         this.warningText = "请重试。";
+        this.loadRandomData();
       } else {
         // 用户选择的图片与正确图片完全匹配
         console.log('答案正确');

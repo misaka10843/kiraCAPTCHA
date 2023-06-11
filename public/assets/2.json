@@ -1,0 +1,54 @@
+{
+  "character": "天天座理世",
+  "images": [
+    {
+      "id": 1,
+      "url": "/assets/test/5.jpg",
+      "selected": false
+    },
+    {
+      "id": 2,
+      "url": "/assets/test/3.jpg",
+      "selected": false
+    },
+    {
+      "id": 3,
+      "url": "/assets/test/1.jpg",
+      "selected": false
+    },
+    {
+      "id": 4,
+      "url": "/assets/test/4.jpg",
+      "selected": false
+    },
+    {
+      "id": 5,
+      "url": "/assets/test/2.jpg",
+      "selected": false
+    },
+    {
+      "id": 6,
+      "url": "/assets/test/9.jpg",
+      "selected": false
+    },
+    {
+      "id": 7,
+      "url": "/assets/test/8.jpg",
+      "selected": false
+    },
+    {
+      "id": 8,
+      "url": "/assets/test/7.jpg",
+      "selected": false
+    },
+    {
+      "id": 9,
+      "url": "/assets/test/6.jpg",
+      "selected": false
+    }
+  ],
+  "correctImageIds": [
+    3,
+    8
+  ]
+}
