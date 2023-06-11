@@ -3,38 +3,51 @@
     <div class="rc-anchor-content">
       <div class="rc-inline-block">
         <div class="rc-anchor-center-container">
-          <div class="rc-anchor-center-item rc-anchor-checkbox-holder"><span
-              class="recaptcha-checkbox goog-inline-block recaptcha-checkbox-unchecked rc-anchor-checkbox" role="checkbox"
-              aria-checked="false" id="recaptcha-anchor" dir="ltr" aria-labelledby="recaptcha-anchor-label"
-              aria-disabled="false" tabindex="0">
-              <div class="recaptcha-checkbox-border" role="presentation" style=""></div>
-              <div class="recaptcha-checkbox-borderAnimation" role="presentation" style=""></div>
-              <div class="recaptcha-checkbox-spinner" role="presentation"
-                style="display: none; animation-play-state: running; opacity: 0; transform: scale(0);">
-                <div class="recaptcha-checkbox-spinner-overlay" style="animation-play-state: running;"></div>
-              </div>
-              <div class="recaptcha-checkbox-checkmark" role="presentation"></div>
-            </span></div>
+          <div class="rc-anchor-center-item rc-anchor-checkbox-holder">
+            <span class="recaptcha-checkbox goog-inline-block recaptcha-checkbox-unchecked rc-anchor-checkbox"
+              v-on:click="isChildVisible = true">
+              <div class="recaptcha-checkbox-border"></div>
+              <div class="recaptcha-checkbox-checkmark"></div>
+            </span>
+          </div>
         </div>
       </div>
       <div class="rc-inline-block">
-        <div class="rc-anchor-center-container"><label class="rc-anchor-center-item rc-anchor-checkbox-label"
-            aria-hidden="true" role="presentation" id="recaptcha-anchor-label"><span aria-live="polite"
-              aria-labelledby="recaptcha-accessible-status"></span>进行人机身份验证</label></div>
+        <div class="rc-anchor-center-container">
+          <label class="rc-anchor-center-item rc-anchor-checkbox-label">
+            进行人机身份验证</label>
+        </div>
       </div>
     </div>
     <div class="rc-anchor-normal-footer">
-      <div class="rc-anchor-logo-portrait" aria-hidden="true" role="presentation">
+      <div class="rc-anchor-logo-portrait">
         <div class="rc-anchor-logo-img rc-anchor-logo-img-portrait"></div>
         <div class="rc-anchor-logo-text">kiraCAPTCHA</div>
       </div>
     </div>
   </div>
+  <CaptchaBoxVue v-if="isChildVisible" @update:ispass="handleIsPass" @close="handleChildClose" />
 </template>
 
-<script>1
+<script>
+import CaptchaBoxVue from "./CaptchaBox.vue";
 export default {
-
+  components: {
+    CaptchaBoxVue
+  },
+  data () {
+    return {
+      isChildVisible: false,
+    };
+  },
+  methods: {
+    handleIsPass (ispass) {
+      this.isChildVisible = !ispass;
+    },
+    handleChildClose () {
+      this.isChildVisible = false;
+    },
+  },
 }
 </script>
 

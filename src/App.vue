@@ -1,13 +1,12 @@
 <script setup>
 import Captcha from "./components/Captcha.vue";
-import CaptchaBoxVue from "./components/CaptchaBox.vue";
+
 
 
 </script>
 
 <template>
   <Captcha />
-  <CaptchaBoxVue />
 </template>
 
 <style scoped>

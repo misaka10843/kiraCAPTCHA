@@ -22,6 +22,13 @@
             </path>
           </svg>
         </button>
+        <button @click="$emit('close')" class="reset icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z">
+            </path>
+          </svg>
+        </button>
       </div>
       <button class="blue" @click="checkAnswer">验证</button>
     </div><!---->
@@ -134,6 +141,7 @@ export default {
       } else {
         // 用户选择的图片与正确图片完全匹配
         console.log('答案正确');
+        this.$emit('update:ispass', true);
       }
     }
   }
