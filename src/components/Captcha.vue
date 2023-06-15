@@ -26,7 +26,7 @@
       </div>
     </div>
   </div>
-  <CaptchaBoxVue v-if="isChildVisible" @update:ispass="handleIsPass" @close="handleChildClose" />
+  <CaptchaBoxVue v-if="isChildVisible" @update:ispass="handleIsPass" @close="handleChildClose" :jsonFileCountProps="2" :jsonBaseUrlProps="/assets/" />
 </template>
 
 <script>

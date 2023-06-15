@@ -37,15 +37,16 @@
 
 <script>
 export default {
+  props:['jsonFileCountProps','jsonBaseUrlProps'],
   data () {
     return {
       character: null,
       images: [],
       correctImageIds: [],
       warningText: "",
-      jsonBaseUrl: "/assets/",
-      jsonFileCount: "2",
-      lastRandomIndex: null,
+      jsonBaseUrl: this.jsonBaseUrlProps,
+      jsonFileCount: this.jsonFileCountProps,
+      lastRandomIndex: 0,
     }
   },
   mounted () {
@@ -142,6 +143,7 @@ export default {
         // 用户选择的图片与正确图片完全匹配
         console.log('答案正确');
         this.$emit('update:ispass', true);
+
       }
     }
   }
