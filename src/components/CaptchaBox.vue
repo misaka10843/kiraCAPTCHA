@@ -62,6 +62,13 @@ export default {
     this.loadRandomData()
   },
   methods: {
+    //进行洗牌操作，保证就算抽到相同的组显示顺序也不一样
+    shuffleImages() {
+      for (let i = this.images.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[this.images[i], this.images[j]] = [this.images[j], this.images[i]]
+      }
+    },
     loadRandomData() {
       let randomIndex = this.lastRandomIndex // Start with the last random index
       while (randomIndex === this.lastRandomIndex) {
@@ -76,6 +83,7 @@ export default {
           this.images = data.images
           this.correctImageIds = data.correctImageIds
           this.resetSelections()
+          this.shuffleImages()
         })
         .catch((error) => {
           console.error('Error fetching data:', error)
