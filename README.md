@@ -10,3 +10,7 @@
 ## 一些截图（WIP，可能已经过时）
 
 ![image.png](https://s2.loli.net/2023/06/09/1J7YnfAa9lMwyOo.png)
+
+gif截图：
+
+![chrome-capture-2024-0-13 (1)](https://github.com/misaka10843/kiraCAPTCHA/assets/69132853/d30f8845-d8bf-40b2-9b8d-ea00fb3206f0)
