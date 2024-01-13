@@ -1,66 +1,181 @@
 <template>
-  <div id="rc-anchor-container" class="rc-anchor rc-anchor-normal rc-anchor-light">
-    <div class="rc-anchor-content">
-      <div class="rc-inline-block">
-        <div class="rc-anchor-center-container">
-          <div class="rc-anchor-center-item rc-anchor-checkbox-holder">
-            <span class="recaptcha-checkbox goog-inline-block recaptcha-checkbox-unchecked rc-anchor-checkbox"
-              v-on:click="isChildVisible = true">
-              <div class="recaptcha-checkbox-border"></div>
-              <div class="recaptcha-checkbox-checkmark"></div>
-            </span>
+  <div id="parent-container" style="position: relative; z-index: 1">
+    <div
+      id="rc-anchor-container"
+      class="rc-anchor rc-anchor-normal rc-anchor-light"
+    >
+      <div class="rc-anchor-content">
+        <div class="rc-inline-block">
+          <div class="rc-anchor-center-container">
+            <div class="rc-anchor-center-item rc-anchor-checkbox-holder">
+              <span
+                class="recaptcha-checkbox goog-inline-block recaptcha-checkbox-unchecked rc-anchor-checkbox"
+                v-on:click="isChildVisible = true"
+              >
+                <div class="recaptcha-checkbox-border"></div>
+                <div class="recaptcha-checkbox-checkmark"></div>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="rc-inline-block">
+          <div class="rc-anchor-center-container">
+            <label class="rc-anchor-center-item rc-anchor-checkbox-label">
+              进行人机身份验证</label
+            >
           </div>
         </div>
       </div>
-      <div class="rc-inline-block">
-        <div class="rc-anchor-center-container">
-          <label class="rc-anchor-center-item rc-anchor-checkbox-label">
-            进行人机身份验证</label>
+      <div class="rc-anchor-normal-footer">
+        <div class="rc-anchor-logo-portrait">
+          <div class="rc-anchor-logo-img rc-anchor-logo-img-portrait"></div>
+          <div class="rc-anchor-logo-text">kiraCAPTCHA</div>
         </div>
       </div>
     </div>
-    <div class="rc-anchor-normal-footer">
-      <div class="rc-anchor-logo-portrait">
-        <div class="rc-anchor-logo-img rc-anchor-logo-img-portrait"></div>
-        <div class="rc-anchor-logo-text">kiraCAPTCHA</div>
-      </div>
+    <div class="box" ref="captchaBoxRef">
+      <transition name="fade">
+        <CaptchaBoxVue
+          v-if="isChildVisible"
+          @update:ispass="handleIsPass"
+          @close="handleChildClose"
+          :jsonFileCountProps="2"
+          :jsonBaseUrlProps="/assets/"
+        />
+      </transition>
     </div>
   </div>
-  <CaptchaBoxVue v-if="isChildVisible" @update:ispass="handleIsPass" @close="handleChildClose" :jsonFileCountProps="2" :jsonBaseUrlProps="/assets/" />
 </template>
 
 <script>
-import CaptchaBoxVue from "./CaptchaBox.vue";
+import CaptchaBoxVue from './CaptchaBox.vue'
 export default {
   components: {
-    CaptchaBoxVue
+    CaptchaBoxVue,
   },
-  data () {
+  data() {
     return {
       isChildVisible: false,
-    };
+    }
   },
   methods: {
-    handleIsPass (ispass) {
-      this.isChildVisible = !ispass;
+    handleIsPass(ispass) {
+      this.isChildVisible = !ispass
     },
-    handleChildClose () {
-      this.isChildVisible = false;
+    handleChildClose() {
+      this.isChildVisible = false
     },
+    handleClickOutside(event) {
+      // 点击事件的目标元素不在组件内部时，关闭组件
+      if (!this.$el.contains(event.target)) {
+        this.isChildVisible = false
+      }
+    },
+    positionCaptchaBox() {
+      const captchaBox = this.$refs.captchaBoxRef
+      const rcAnchorCheckbox = document.querySelector(
+        '.rc-anchor-checkbox-holder'
+      )
+      const fontSize = parseFloat(
+        getComputedStyle(document.documentElement).fontSize
+      )
+
+      if (!captchaBox || !rcAnchorCheckbox) {
+        return
+      }
+
+      const parentContainer = document.getElementById('parent-container')
+      const parentWidth = parentContainer.offsetWidth
+      const parentHeight = window.innerHeight
+
+      const captchaBoxWidth = fontSize * 27
+      const captchaBoxHeight = 561
+
+      const rcAnchorCheckboxRect = rcAnchorCheckbox.getBoundingClientRect()
+      const rcAnchorCheckboxCenterX =
+        rcAnchorCheckboxRect.left + rcAnchorCheckboxRect.width / 2
+      const rcAnchorCheckboxCenterY =
+        rcAnchorCheckboxRect.top + rcAnchorCheckboxRect.height / 2
+
+      const captchaBoxLeft = rcAnchorCheckboxCenterX + 20
+      const captchaBoxRight = rcAnchorCheckboxCenterX - captchaBoxWidth - 20
+
+      let captchaBoxTop = rcAnchorCheckboxCenterY - captchaBoxHeight / 2
+
+      // 检查 captcha-box 顶部是否超过屏幕边界
+      if (captchaBoxTop < 0) {
+        captchaBoxTop = 0
+      }
+
+      // 检查 captcha-box 底部是否超过屏幕边界
+      if (captchaBoxTop + captchaBoxHeight > parentHeight) {
+        captchaBoxTop = parentHeight - captchaBoxHeight
+        console.log('底边超过')
+      }
+
+      // 检查是否可以容纳在 rc-anchor-checkbox-holder 的左侧
+      if (captchaBoxLeft + captchaBoxWidth <= parentWidth) {
+        captchaBox.style.left = captchaBoxLeft + 'px'
+        captchaBox.style.right = 'auto'
+        console.log('可以放在左边')
+      }
+      // 检查是否可以容纳在 rc-anchor-checkbox-holder 的右侧
+      else if (captchaBoxRight >= 0) {
+        captchaBox.style.left = 'auto'
+        captchaBox.style.right = captchaBoxRight + 'px'
+        console.log('可以放在右边')
+      }
+      // 居中显示在屏幕正中间
+      else {
+        captchaBox.style.left = '50%'
+        captchaBox.style.transform = 'translateX(-50%)'
+        captchaBox.style.right = 'auto'
+        console.log('只能放在中间')
+      }
+
+      captchaBox.style.top = captchaBoxTop + 'px'
+      console.log(captchaBox.style)
+    },
+  },
+  mounted() {
+    this.positionCaptchaBox()
+    window.addEventListener('resize', this.positionCaptchaBox)
+    // 在组件挂载后，给整个文档添加点击事件监听器
+    document.addEventListener('click', this.handleClickOutside)
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.positionCaptchaBox)
+  },
+  beforeDestroy() {
+    // 在组件销毁前，移除点击事件监听器
+    document.removeEventListener('click', this.handleClickOutside)
   },
 }
 </script>
 
 <style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: none;
+}
+.box {
+  position: fixed;
+  z-index: 2;
+}
 .rc-anchor {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
-  -moz-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
-  box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
-  -webkit-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
-  -moz-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
+  -webkit-box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+  -moz-box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+  -webkit-box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
+  -moz-box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.08);
 }
 
 .rc-anchor-light.rc-anchor-normal,
@@ -164,7 +279,7 @@ export default {
 }
 
 .recaptcha-checkbox-spinner-overlay {
-  content: "";
+  content: '';
   position: absolute;
   top: -7px;
   left: -7px;
